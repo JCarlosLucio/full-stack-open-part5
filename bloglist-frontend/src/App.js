@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Blog from './components/Blog';
 import BlogForm from './components/BlogForm';
 import LoginForm from './components/LoginForm';
+import Notification from './components/Notification';
 import blogService from './services/blogs';
 import loginService from './services/login';
 
@@ -13,6 +14,7 @@ const App = () => {
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
   const [url, setUrl] = useState('');
+  const [notification, setNotification] = useState(null);
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -38,8 +40,19 @@ const App = () => {
       setUser(user);
       setUsername('');
       setPassword('');
+      setNotification({
+        type: 'success',
+        message: `Welcome back, ${user.name}!`,
+      });
+      setTimeout(() => {
+        setNotification(null);
+      }, 5000);
     } catch (error) {
-      console.error(error);
+      console.error(error.response.data.error);
+      setNotification({ type: 'error', message: error.response.data.error });
+      setTimeout(() => {
+        setNotification(null);
+      }, 5000);
     }
   };
 
@@ -53,8 +66,19 @@ const App = () => {
       setTitle('');
       setAuthor('');
       setUrl('');
+      setNotification({
+        type: 'success',
+        message: `a new blog ${newBlog.title} by ${newBlog.author} added`,
+      });
+      setTimeout(() => {
+        setNotification(null);
+      }, 5000);
     } catch (error) {
       console.error(error);
+      setNotification({ type: 'error', message: error.response.data.error });
+      setTimeout(() => {
+        setNotification(null);
+      }, 5000);
     }
   };
 
@@ -62,12 +86,20 @@ const App = () => {
     window.localStorage.removeItem('loggedBloglistUser');
     blogService.setToken(null);
     setUser(null);
+    setNotification({
+      type: 'success',
+      message: 'You have been logged out successfully',
+    });
+    setTimeout(() => {
+      setNotification(null);
+    }, 5000);
   };
 
   if (!user) {
     return (
       <div>
         <h2>log in to application</h2>
+        <Notification notification={notification} />
         <LoginForm
           username={username}
           password={password}
@@ -82,6 +114,7 @@ const App = () => {
   return (
     <div>
       <h2>blogs</h2>
+      <Notification notification={notification} />
       <p>
         {user.name} logged in
         <button onClick={handleLogout}>logout</button>
