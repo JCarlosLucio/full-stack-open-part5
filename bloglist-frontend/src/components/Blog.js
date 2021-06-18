@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 
-const Blog = ({ blog, handleLike }) => {
+const Blog = ({ blog, likeBlog, removeBlog, user }) => {
   const [visible, setVisible] = useState(false);
 
   const toggleVisibility = () => setVisible(!visible);
 
-  const details = { display: visible ? '' : 'none' };
+  const showDetails = { display: visible ? '' : 'none' };
+
+  const showWhenOwner = {
+    display: user.username === blog.user.username ? '' : 'none',
+  };
 
   const blogStyle = {
     paddingTop: 10,
@@ -19,15 +23,18 @@ const Blog = ({ blog, handleLike }) => {
     <div style={blogStyle}>
       <div>
         {blog.title} {blog.author}
-        <button onClick={toggleVisibility}>view</button>
+        <button onClick={toggleVisibility}>{visible ? 'hide' : 'view'}</button>
       </div>
-      <div style={details}>
+      <div style={showDetails}>
         <div>{blog.url}</div>
         <div>
           likes {blog.likes}
-          <button onClick={handleLike}>like</button>
+          <button onClick={likeBlog}>like</button>
         </div>
         <div>{blog.user.name}</div>
+        <div style={showWhenOwner}>
+          <button onClick={removeBlog}>remove</button>
+        </div>
       </div>
     </div>
   );

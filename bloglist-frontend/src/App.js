@@ -76,7 +76,7 @@ const App = () => {
     }
   };
 
-  const handleLike = async (id) => {
+  const likeBlog = async (id) => {
     const blogToLike = blogs.find((blog) => blog.id === id);
     const likedBlog = {
       ...blogToLike,
@@ -107,6 +107,32 @@ const App = () => {
     setTimeout(() => {
       setNotification(null);
     }, 5000);
+  };
+
+  const removeBlog = async (id) => {
+    const blogToRemove = blogs.find((blog) => blog.id === id);
+    const result = window.confirm(
+      `Remove blog ${blogToRemove.title} by ${blogToRemove.author}?`
+    );
+    if (result) {
+      try {
+        await blogService.remove(id);
+        setBlogs(blogs.filter((blog) => blog.id !== id));
+        setNotification({
+          type: 'success',
+          message: `Removed ${blogToRemove.title} successfully`,
+        });
+        setTimeout(() => {
+          setNotification(null);
+        }, 5000);
+      } catch (error) {
+        console.error(error);
+        setNotification({ type: 'error', message: error.response.data.error });
+        setTimeout(() => {
+          setNotification(null);
+        }, 5000);
+      }
+    }
   };
 
   if (!user) {
@@ -143,7 +169,9 @@ const App = () => {
           <Blog
             key={blog.id}
             blog={blog}
-            handleLike={() => handleLike(blog.id)}
+            likeBlog={() => likeBlog(blog.id)}
+            removeBlog={() => removeBlog(blog.id)}
+            user={user}
           />
         ))}
     </div>
