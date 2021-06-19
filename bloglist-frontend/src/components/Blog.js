@@ -8,7 +8,7 @@ const Blog = ({ blog, likeBlog, removeBlog, user }) => {
   const showDetails = { display: visible ? '' : 'none' };
 
   const showWhenOwner = {
-    display: user.username === blog.user.username ? '' : 'none',
+    display: user?.username === blog.user.username ? '' : 'none',
   };
 
   const blogStyle = {
@@ -20,12 +20,12 @@ const Blog = ({ blog, likeBlog, removeBlog, user }) => {
   };
 
   return (
-    <div style={blogStyle}>
+    <div className="blog" style={blogStyle}>
       <div>
         {blog.title} {blog.author}
         <button onClick={toggleVisibility}>{visible ? 'hide' : 'view'}</button>
       </div>
-      <div style={showDetails}>
+      <div className="blogDetails" style={showDetails}>
         <div>{blog.url}</div>
         <div>
           likes {blog.likes}
