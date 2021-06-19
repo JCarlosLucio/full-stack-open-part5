@@ -1,26 +1,40 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
-import { render } from '@testing-library/react';
+import { fireEvent, render } from '@testing-library/react';
 import Blog from './Blog';
 
 describe('<Blog />', () => {
-  test('should display title and author but not url or likes', () => {
+  let component;
+
+  beforeEach(() => {
     const blog = {
       title: 'The Title for the test',
       author: 'The Blog Author',
-      url: 'http://localhost:8080',
+      url: 'https://fakeurl.dev',
       likes: 0,
       user: {
         username: 'yoshi',
         name: 'Yoshi',
       },
     };
+    component = render(<Blog blog={blog} />);
+  });
 
-    const component = render(<Blog blog={blog} />);
+  test('should display title and author but not url or likes', () => {
     expect(component.container).toHaveTextContent('The Title for the test');
     expect(component.container).toHaveTextContent('The Blog Author');
 
     const blogDetails = component.container.querySelector('.blogDetails');
     expect(blogDetails).toHaveStyle('display: none');
+  });
+
+  test('should show url and likes after button click', () => {
+    const viewButton = component.getByText('view');
+    fireEvent.click(viewButton);
+
+    const blogDetails = component.container.querySelector('.blogDetails');
+    expect(blogDetails).not.toHaveStyle('display: none');
+    expect(blogDetails).toHaveTextContent('https://fakeurl.dev');
+    expect(blogDetails).toHaveTextContent('likes 0');
   });
 });
