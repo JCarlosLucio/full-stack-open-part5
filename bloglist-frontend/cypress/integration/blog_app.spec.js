@@ -56,5 +56,22 @@ describe('Blog app', function () {
         .and('have.css', 'color', 'rgb(0, 128, 0)');
       cy.contains('testTitle testAuthor');
     });
+
+    describe('and a blog exist', function () {
+      beforeEach(function () {
+        cy.createBlog({
+          title: 'my test blog',
+          author: 'Cypress',
+          url: 'http://testblog.dev',
+        });
+      });
+
+      it.only('A blog can be liked', function () {
+        cy.contains('my test blog Cypress').parent().as('testBlog');
+        cy.get('@testBlog').find('.toggle-view-button').click();
+        cy.get('@testBlog').find('.like-button').click();
+        cy.get('@testBlog').should('contain', 'likes 1');
+      });
+    });
   });
 });
