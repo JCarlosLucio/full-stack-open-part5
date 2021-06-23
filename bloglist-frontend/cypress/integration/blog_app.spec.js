@@ -55,10 +55,16 @@ describe('Blog app', function () {
         .should('contain', 'a new blog testTitle by testAuthor added')
         .and('have.css', 'color', 'rgb(0, 128, 0)');
       cy.contains('testTitle testAuthor');
+      cy.get('div.blog').should('have.length', 1);
     });
 
-    describe('and a blog exist', function () {
+    describe('and several blogs exist', function () {
       beforeEach(function () {
+        cy.createBlog({
+          title: 'first blog',
+          author: 'Cypress',
+          url: 'http://testblog.dev',
+        });
         cy.createBlog({
           title: 'my test blog',
           author: 'Cypress',
@@ -66,11 +72,35 @@ describe('Blog app', function () {
         });
       });
 
-      it.only('A blog can be liked', function () {
+      it('A blog can be liked', function () {
         cy.contains('my test blog Cypress').parent().as('testBlog');
         cy.get('@testBlog').find('.toggle-view-button').click();
         cy.get('@testBlog').find('.like-button').click();
         cy.get('@testBlog').should('contain', 'likes 1');
+      });
+
+      it('A blog can be removed by user who created it', function () {
+        cy.contains('my test blog Cypress').parent().as('testBlog');
+        cy.get('@testBlog').find('.toggle-view-button').click();
+        cy.get('@testBlog').find('.remove-button').click();
+        cy.get('.notification.success')
+          .should('contain', 'Removed my test blog successfully')
+          .and('have.css', 'color', 'rgb(0, 128, 0)');
+        cy.get('div.blog').should('have.length', 1);
+      });
+
+      it("A blog can't be removed by other users", function () {
+        cy.contains('logout').click();
+        const otherUser = {
+          username: 'otherUser',
+          name: 'Other User',
+          password: '1234',
+        };
+        cy.request('POST', 'http://localhost:3003/api/users', otherUser);
+        cy.login({ username: 'otherUser', password: '1234' });
+        cy.contains('my test blog Cypress').parent().as('testBlog');
+        cy.get('@testBlog').find('.toggle-view-button').click();
+        cy.get('@testBlog').should('not.contain', '.remove-button');
       });
     });
   });

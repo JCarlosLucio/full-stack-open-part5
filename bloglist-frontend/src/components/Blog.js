@@ -37,7 +37,9 @@ const Blog = ({ blog, likeBlog, removeBlog, user }) => {
         </div>
         <div>{blog.user.name}</div>
         <div style={showWhenOwner}>
-          <button onClick={removeBlog}>remove</button>
+          <button className="remove-button" onClick={removeBlog}>
+            remove
+          </button>
         </div>
       </div>
     </div>
